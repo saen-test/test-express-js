@@ -54,10 +54,7 @@ jobs:
       environment:
         name: dev
         url: https://github.com/saen-test/test-express-js/security/code-scanning
-      permissions:
-        actions: read
-        contents: read
-        security-events: write
+      permissions: write-all
 
       strategy:
         fail-fast: false
