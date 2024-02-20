@@ -90,7 +90,7 @@ jobs:
       - name: Quality Gate Check
         uses: saen-test/test-quality-gate-action@main
         with:
-          repository: corp-ais/AIS-FED-Node-repo
+          repository: saen-test/test-express-js
           severity: high
         env:
           GITHUB_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
