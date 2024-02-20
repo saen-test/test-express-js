@@ -2,9 +2,9 @@ name: DEV - CI
 
 on:
   push:
-    branches: [develop,ffdev,hotfix_* ]   
+    branches: [main, develop,ffdev,hotfix_* ]   
   pull_request:
-    branches: [develop,ffdev,hotfix_* ]    
+    branches: [main, develop,ffdev,hotfix_* ]    
   workflow_dispatch:
 
 env:
