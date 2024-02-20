@@ -7,6 +7,7 @@ import path from "path";
 import cookieParser from "cookie-parser";
 import logger from "morgan";
 import cors from "cors";
+import csrf from "csurf";
 import { rateLimit } from "express-rate-limit";
 const app = express();
 import indexRouter from "./routes/index.js";
@@ -56,12 +57,7 @@ const limiter = rateLimit({
 // apply rate limiter to all requests
 app.use(limiter);
 
-const conditionalCSRF = function (req, res, next) {
-  //compute needCSRF here as appropriate based on req.path or whatever
-  next();
-};
-
-app.use(conditionalCSRF);
+app.use(csrf({ cookie: true }));
 
 app.use("/", indexRouter);
 app.use("/user", usersRouter);
