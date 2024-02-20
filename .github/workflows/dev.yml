@@ -54,7 +54,10 @@ jobs:
       environment:
         name: dev
         url: https://github.com/saen-test/test-express-js/security/code-scanning
-      permissions: write-all
+      permissions:
+        actions: read
+        contents: read
+        security-events: write
 
       strategy:
         fail-fast: false
@@ -90,7 +93,7 @@ jobs:
           repository: saen-test/test-express-js
           severity: high
         env:
-          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: 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
           
   #  build:
   #   runs-on: ubuntu-latest
