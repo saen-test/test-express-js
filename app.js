@@ -65,13 +65,13 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use("/", indexRouter);
-app.use("/user", usersRouter);
-app.use("/privilege", privilegeRouter);
-app.use("/payment", paymentRouter);
-app.use("/order", orderRouter);
-app.use("/azure", azureRouter);
-app.use("/sim", simRouter);
+// app.use("/", indexRouter);
+// app.use("/user", usersRouter);
+// app.use("/privilege", privilegeRouter);
+// app.use("/payment", paymentRouter);
+// app.use("/order", orderRouter);
+// app.use("/azure", azureRouter);
+// app.use("/sim", simRouter);
 
 app.use(function (req, res, next) {
   redisClient();
