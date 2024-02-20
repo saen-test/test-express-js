@@ -80,8 +80,8 @@ jobs:
       #   with:
       #     languages: ${{ matrix.language }}
          
-      - name: Autobuild
-        uses: github/codeql-action/autobuild@v2
+      # - name: Autobuild
+      #   uses: github/codeql-action/autobuild@v2
 
      
       # - name: Perform CodeQL Analysis
