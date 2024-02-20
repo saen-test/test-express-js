@@ -1,0 +1,139 @@
+name: DEV - CI 
+
+on:
+  push:
+    branches: [develop,ffdev,hotfix_* ]   
+  pull_request:
+    branches: [develop,ffdev,hotfix_* ]    
+  workflow_dispatch:
+
+env:
+  
+  AZURE_WEBAPP_PACKAGE_PATH: '.'      # set this to the path to your web app project, defaults to the repository root
+  NODE_VERSION: '16.x'                # set this to the node version to use
+  CI: false
+  ENV_TAG: 'dev'
+  GITHUB_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
+jobs:
+   unitest:
+        name: UnitTest
+        runs-on: ubuntu-latest
+
+        environment:
+          name: dev
+        steps:
+        - name: Checkout code
+          uses: actions/checkout@v3
+          
+        - name: Replace Image Tag  
+          uses: cschleiden/replace-tokens@v1
+          with:
+              files: '["**/*.json"]'
+          env:
+              ENV: ${{ env.ENV_TAG}}
+        - name: Set up Node.js
+          uses: actions/setup-node@v3
+          with:
+            node-version: ${{ env.NODE_VERSION }}
+            cache: 'npm'
+
+        - name: Install dependencies
+          run: npm install
+
+        - name: "List working directory"
+          run: ls
+
+        - name: Unit test
+          run: npm test
+
+        
+            
+   analyze:
+      name: SAST CodeQL
+      runs-on: ubuntu-latest
+      environment:
+        name: dev
+        url: https://github.com/corp-ais/Croissant-FED-Node-repo/security/code-scanning
+      permissions:
+        actions: read
+        contents: read
+        security-events: write
+
+      strategy:
+        fail-fast: false
+        matrix:
+          language: [ 'javascript' ]
+         
+      steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Replace Image Tag  
+        uses: cschleiden/replace-tokens@v1
+        with:
+              files: '["**/*.json"]'
+        env:
+              ENV: ${{ env.ENV_TAG}}
+              
+      # Initializes the CodeQL tools for scanning.
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: ${{ matrix.language }}
+         
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v2
+
+     
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+
+      - name: Quality Gate Check
+        uses: corp-ais/quality-gate-action@main
+        with:
+          repository: corp-ais/AIS-FED-Node-repo
+          severity: high
+        env:
+          GITHUB_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
+          
+   build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Replace Image Tag  
+        uses: cschleiden/replace-tokens@v1
+        with:
+              files: '["**/*.json"]'
+        env:
+              ENV: ${{ env.ENV_TAG}}
+
+      - name: Set up Node.js version
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16.x'
+
+      - name: npm install and build
+        run: |
+          npm install
+          npm run build --if-present
+   
+   repo-dispatch:
+    name: Repository Dispatch
+    runs-on: ubuntu-latest
+    needs: [analyze,unitest]
+    environment:
+      name: dev
+      url: https://github.com/corp-ais/croissant-pipeline/actions/workflows/fed_node_dev.yml
+    steps:
+    - name: Repository Dispatch
+      if: ${{ github.event_name == 'push' }} #&&  github.ref =='refs/heads/ffdev' }} # remove github.ref =='refs/heads/ffmain'
+      uses: peter-evans/repository-dispatch@v2
+      with:
+        token: ${{ secrets.REPO_ACCESS_TOKEN }}
+        repository: corp-ais/croissant-pipeline
+        event-type: fed-node-cd-dev
+        client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'
+      
+            
+
+     
