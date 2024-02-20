@@ -93,7 +93,7 @@ jobs:
           repository: saen-test/test-express-js
           severity: high
         env:
-          GITHUB_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
           
    build:
     runs-on: ubuntu-latest
