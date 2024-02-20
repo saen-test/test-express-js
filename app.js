@@ -59,6 +59,12 @@ app.use(limiter);
 
 app.use(csrf({ cookie: true }));
 
+// This middleware must come after the csurf middleware
+app.use((req, res, next) => {
+  res.locals.csrfToken = req.csrfToken();
+  next();
+});
+
 app.use("/", indexRouter);
 app.use("/user", usersRouter);
 app.use("/privilege", privilegeRouter);
