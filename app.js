@@ -56,6 +56,13 @@ const limiter = rateLimit({
 // apply rate limiter to all requests
 app.use(limiter);
 
+const conditionalCSRF = function (req, res, next) {
+  //compute needCSRF here as appropriate based on req.path or whatever
+  next();
+};
+
+app.use(conditionalCSRF);
+
 app.use("/", indexRouter);
 app.use("/user", usersRouter);
 app.use("/privilege", privilegeRouter);
